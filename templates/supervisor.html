@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<title>Reporte de avance técnico</title>
+
+<style>
+
+body{
+font-family: Arial;
+background:#f4f6f9;
+}
+
+.container{
+width:800px;
+margin:auto;
+background:white;
+padding:30px;
+margin-top:40px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+.logo{
+text-align:center;
+margin-bottom:20px;
+}
+
+h1{
+text-align:center;
+color:#2c5aa0;
+}
+
+input, textarea{
+width:100%;
+padding:10px;
+margin-top:10px;
+margin-bottom:20px;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+button{
+background:#2c5aa0;
+color:white;
+border:none;
+padding:12px;
+width:100%;
+border-radius:5px;
+font-size:16px;
+cursor:pointer;
+}
+
+button:hover{
+background:#1f3e73;
+}
+
+.alert{
+background:#ffdede;
+padding:15px;
+margin-bottom:20px;
+border-radius:5px;
+}
+
+.success{
+background:#d4edda;
+padding:15px;
+margin-bottom:20px;
+border-radius:5px;
+}
+
+.contrato-card{
+background:#eef3ff;
+padding:20px;
+border-radius:8px;
+margin-top:20px;
+border-left:6px solid #2c5aa0;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="logo">
+<img src="/static/logo.png" width="120">
+</div>
+
+<h1>Oficina de Planeación</h1>
+<h3 style="text-align:center;">Sistema de reporte de avance técnico contractual</h3>
+
+
+{% if error %}
+<div class="alert">
+{{error}}
+</div>
+{% endif %}
+
+{% if mensaje %}
+<div class="success">
+✔ {{mensaje}}
+</div>
+{% endif %}
+
+
+{% if not contrato %}
+
+<form method="post" action="/buscar">
+
+<label>Número de contrato</label>
+
+<input type="text" name="contrato" placeholder="Ejemplo: 745-2025">
+
+<button type="submit">Buscar contrato</button>
+
+</form>
+
+{% endif %}
+
+
+
+{% if contrato %}
+
+<div class="contrato-card">
+
+<h3>Información del contrato</h3>
+
+<p><b>Contrato:</b> {{contrato}}</p>
+<p><b>Contratista:</b> {{contratista}}</p>
+<p><b>Supervisor:</b> {{supervisor}}</p>
+<p><b>Departamento:</b> {{departamento}}</p>
+<p><b>Ciudad:</b> {{ciudad}}</p>
+
+</div>
+
+{% if ventana %}
+
+<form method="post" action="/guardar">
+
+<input type="hidden" name="contrato" value="{{contrato}}">
+
+<label>Porcentaje de ejecución técnica actual</label>
+
+<input type="text" name="porcentaje" placeholder="Ejemplo: 74.35 o 74,35">
+
+<label>Observaciones</label>
+
+<textarea name="observaciones" rows="4"></textarea>
+
+<button type="submit">Guardar reporte</button>
+
+</form>
+
+{% else %}
+
+<div class="alert">
+
+La ventana de reporte se encuentra cerrada.  
+El registro de información se habilita entre el día 1 y el día 9 de cada mes.
+
+<br><br>
+
+Para mayor información comuníquese al correo  
+<b>cristhian.sarralde@renovacionterritorio.gov.co</b>
+
+</div>
+
+{% endif %}
+
+{% endif %}
+
+</div>
+
+</body>
+</html>
