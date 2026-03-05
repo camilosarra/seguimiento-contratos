@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Reporte avance técnico</title>
+
+{% if mensaje %}
+<div style="background:#d4edda;padding:20px;margin-bottom:20px;border-radius:5px;">
+✔ {{mensaje}}
+</div>
+{% endif %}
+
+<style>
+
+body{
+font-family: Arial;
+background:#f5f6fa;
+padding:40px;
+}
+
+.contrato-card{
+background:#eef3ff;
+padding:20px;
+border-radius:8px;
+margin-top:20px;
+border-left:6px solid #2c5aa0;
+}
+
+.card{
+background:white;
+padding:30px;
+border-radius:10px;
+max-width:700px;
+margin:auto;
+}
+
+h1{
+text-align:center;
+}
+
+input{
+width:100%;
+padding:10px;
+margin-top:10px;
+margin-bottom:20px;
+}
+
+textarea{
+width:100%;
+height:120px;
+}
+
+button{
+background:#1f3c88;
+color:white;
+padding:12px;
+border:none;
+width:100%;
+}
+
+.alert{
+background:#ffe0e0;
+padding:20px;
+margin-bottom:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>Agencia de Renovación del Territorio</h1>
+<h3>Oficina de Planeación</h3>
+
+<h2>Sistema de reporte de avance técnico contractual</h2>
+
+{% if error %}
+<div class="alert">
+{{error}}
+</div>
+{% endif %}
+
+La ventana de reporte se encuentra cerrada.
+
+<br><br>
+
+El registro de información se habilita entre el día 1 y el día 9 de cada mes.
+
+<br><br>
+
+Para mayor información, comuníquese al correo:
+cristhian.sarralde@renovacionterritorio.gov.co
+
+</div>
+
+{% endif %}
+
+<form action="/buscar" method="post">
+
+<label>Número de contrato</label>
+
+<input name="contrato" placeholder="Ejemplo 745-2025">
+
+<button>Buscar contrato</button>
+
+</form>
+
+{% if contrato %}
+
+<hr>
+
+<div class="contrato-card">
+
+<h3>Información del contrato</h3>
+
+<p><b>Contrato:</b> {{contrato}}</p>
+<p><b>Contratista:</b> {{contratista}}</p>
+<p><b>Supervisor:</b> {{supervisor}}</p>
+<p><b>Departamento:</b> {{departamento}}</p>
+<p><b>Ciudad:</b> {{ciudad}}</p>
+
+</div>
+
+{% if ventana %}
+
+<form action="/guardar" method="post">
+
+<input type="hidden" name="contrato" value="{{contrato}}">
+
+<label>Porcentaje de ejecución técnica (%)</label>
+
+<input type="text" name="porcentaje" placeholder="Ejemplo: 74.35 o 74,35">
+
+<label>Observaciones</label>
+
+<textarea name="observaciones"></textarea>
+
+<button>Guardar reporte</button>
+
+</form>
+
+{% endif %}
+
+{% endif %}
+
+</div>
+
+</body>
+</html>
