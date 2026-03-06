@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+
+<title>Reporte contractual</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+}
+
+.container{
+width:900px;
+margin:auto;
+background:white;
+padding:30px;
+margin-top:40px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+margin-top:20px;
+}
+
+.field{
+background:#f7f9fc;
+padding:15px;
+border-radius:8px;
+}
+
+label{
+font-weight:bold;
+}
+
+.edit{
+float:right;
+cursor:pointer;
+color:#2c5aa0;
+}
+
+input,textarea{
+width:100%;
+padding:8px;
+margin-top:5px;
+}
+
+button{
+background:#2c5aa0;
+color:white;
+border:none;
+padding:12px;
+margin-top:15px;
+width:100%;
+border-radius:6px;
+}
+
+.alert{
+background:#fff3cd;
+padding:15px;
+margin-top:15px;
+border-radius:6px;
+}
+
+</style>
+
+<script>
+
+function editar(id){
+
+let campo=document.getElementById(id)
+
+campo.removeAttribute("readonly")
+
+campo.focus()
+
+}
+
+</script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Oficina de Planeación</h2>
+
+<p style="color:#666;">
+Si los datos registrados no se encuentran actualizados, por favor actualice la información
+</p>
+
+{% if error %}
+<div class="alert">
+{{error}}
+</div>
+{% endif %}
+
+{% if not contrato %}
+
+<form method="post" action="/buscar">
+
+<label>Número de contrato</label>
+
+<input name="contrato" placeholder="Ejemplo 745-2025">
+
+<button>Buscar contrato</button>
+
+</form>
+
+{% endif %}
+
+
+{% if contrato %}
+
+<h3>Contrato {{contrato}}</h3>
+
+<div class="grid">
+
+<div class="field">
+<label>Línea de acción</label>
+<span class="edit" onclick="editar('linea')">✏️</span>
+<input id="linea" value="{{linea}}" readonly>
+</div>
+
+<div class="field">
+<label>ID registro</label>
+<input value="{{id}}" readonly>
+</div>
+
+<div class="field">
+<label>Contratista</label>
+<span class="edit" onclick="editar('contratista')">✏️</span>
+<input id="contratista" value="{{contratista}}" readonly>
+</div>
+
+<div class="field">
+<label>NIT / Identificación</label>
+<span class="edit" onclick="editar('identificacion')">✏️</span>
+<input id="identificacion" value="{{identificacion_contratista}}" readonly>
+</div>
+
+<div class="field">
+<label>Subcuenta</label>
+<input value="{{subcuenta}}" readonly>
+</div>
+
+<div class="field">
+<label>Supervisor</label>
+<span class="edit" onclick="editar('supervisor')">✏️</span>
+<input id="supervisor" value="{{supervisor}}" readonly>
+</div>
+
+<div class="field">
+<label>Cédula supervisor</label>
+<input value="{{cedula}}" readonly>
+</div>
+
+<div class="field">
+<label>Correo electrónico</label>
+<span class="edit" onclick="editar('correo')">✏️</span>
+<input id="correo" value="{{correo}}">
+</div>
+
+<div class="field">
+<label>Teléfono</label>
+<span class="edit" onclick="editar('telefono')">✏️</span>
+<input id="telefono" value="{{telefono}}" readonly>
+</div>
+
+<div class="field">
+<label>Dirección</label>
+<span class="edit" onclick="editar('direccion')">✏️</span>
+<input id="direccion" value="{{direccion}}" readonly>
+</div>
+
+<div class="field">
+<label>Departamento</label>
+<input value="{{departamento}}" readonly>
+</div>
+
+<div class="field">
+<label>Ciudad</label>
+<input value="{{ciudad}}" readonly>
+</div>
+
+</div>
+
+{% if ventana %}
+
+<form method="post" action="/guardar">
+
+<input type="hidden" name="contrato" value="{{contrato}}">
+
+<label>Porcentaje de ejecución técnica actual</label>
+
+<input name="porcentaje" placeholder="Ej: 75.25 o 75,25">
+
+<label>Observaciones</label>
+
+<textarea name="observaciones"></textarea>
+
+<button>Guardar reporte</button>
+
+</form>
+
+{% endif %}
+
+{% endif %}
+
+</div>
+
+</body>
+
+</html>
