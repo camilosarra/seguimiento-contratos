@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<title>Dashboard</title>
+
+<style>
+
+body{
+font-family: Arial;
+background:#f4f6f9;
+}
+
+.container{
+width:1000px;
+margin:auto;
+margin-top:40px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:8px;
+}
+
+button{
+background:#2c5aa0;
+color:white;
+border:none;
+padding:10px;
+margin-top:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<h2>Indicadores</h2>
+
+<p>Total contratos: {{total_contratos}}</p>
+<p>Reportados este mes: {{reportados}}</p>
+<p>Pendientes: {{pendientes}}</p>
+
+<a href="/descargar">
+<button>Descargar Excel</button>
+</a>
+
+</div>
+
+<div class="card">
+
+<h2>Últimos reportes</h2>
+
+<table>
+
+<tr>
+<th>Contrato</th>
+<th>Porcentaje</th>
+<th>Observaciones</th>
+<th>Fecha</th>
+</tr>
+
+{% for r in tabla %}
+
+<tr>
+<td>{{r.contrato}}</td>
+<td>{{r.porcentaje}}</td>
+<td>{{r.observaciones}}</td>
+<td>{{r.fecha}}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</div>
+
+</body>
+</html>
