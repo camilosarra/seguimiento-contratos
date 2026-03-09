@@ -260,17 +260,17 @@ Avance técnico Comunicado No. 104
 
 <div class="card">
 
-<form method="post" action="/guardar">
+<form method="post" action="/guardar" style="display:flex; flex-direction:column;">
 
 <input type="hidden" name="contrato" value="{{contrato}}">
 
+<h3>Reporte de ejecución técnica</h3>
+
 <label>Porcentaje de ejecución técnica actual</label>
+<input name="porcentaje" placeholder="Ej: 75.50 o 75,50" style="max-width:250px; margin-bottom:20px;">
 
-<input name="porcentaje" placeholder="Ej: 75.50 o 75,50">
-
-<label style="margin-top:15px;">Observaciones</label>
-
-<textarea name="observaciones"></textarea>
+<label>Observaciones</label>
+<textarea name="observaciones" style="width:100%; margin-bottom:20px;"></textarea>
 
 <button>Guardar reporte</button>
 
@@ -283,5 +283,6 @@ Avance técnico Comunicado No. 104
 </div>
 
 </body>
+
 
 </html>
