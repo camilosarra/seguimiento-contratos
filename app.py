@@ -7,7 +7,7 @@ from database import SessionLocal, engine, Base
 import models
 from models import Contrato, ReporteMensual
 
-# crear tablas automáticamente si no existen
+# crear tablas automáticamente
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -17,9 +17,9 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
-# -----------------------------------------
-# NORMALIZAR NUMERO DE CONTRATO
-# -----------------------------------------
+# ------------------------------------------------
+# NORMALIZAR CONTRATO
+# ------------------------------------------------
 def normalizar_contrato(numero):
 
     numero = numero.strip()
@@ -37,9 +37,25 @@ def normalizar_contrato(numero):
     return f"{parte}-{anio}"
 
 
-# -----------------------------------------
+# ------------------------------------------------
+# LIMPIAR VALORES NAN
+# ------------------------------------------------
+def limpiar(valor):
+
+    if valor is None:
+        return ""
+
+    texto = str(valor).strip().lower()
+
+    if texto == "nan" or texto == "":
+        return ""
+
+    return valor
+
+
+# ------------------------------------------------
 # PAGINA PRINCIPAL
-# -----------------------------------------
+# ------------------------------------------------
 @app.get("/")
 async def inicio(request: Request):
 
@@ -49,9 +65,9 @@ async def inicio(request: Request):
     )
 
 
-# -----------------------------------------
+# ------------------------------------------------
 # BUSCAR CONTRATO
-# -----------------------------------------
+# ------------------------------------------------
 @app.post("/buscar")
 async def buscar(request: Request, contrato: str = Form(...)):
 
@@ -86,7 +102,11 @@ async def buscar(request: Request, contrato: str = Form(...)):
     ejecucion = ""
 
     if ultimo_reporte:
-        ejecucion = f"{ultimo_reporte.porcentaje_ejecucion}%"
+
+        porcentaje = ultimo_reporte.porcentaje_ejecucion
+
+        if porcentaje is not None:
+            ejecucion = f"{round(porcentaje,2)}%"
 
     db.close()
 
@@ -95,29 +115,29 @@ async def buscar(request: Request, contrato: str = Form(...)):
         {
             "request": request,
 
-            "contrato": contrato_db.numero_contrato,
-            "linea": contrato_db.linea,
-            "contratista": contrato_db.contratista,
-            "identificacion_contratista": contrato_db.identificacion_contratista,
-            "subcuenta": contrato_db.subcuenta,
+            "contrato": limpiar(contrato_db.numero_contrato),
+            "linea": limpiar(contrato_db.linea),
+            "contratista": limpiar(contrato_db.contratista),
+            "identificacion_contratista": limpiar(contrato_db.identificacion_contratista),
+            "subcuenta": limpiar(contrato_db.subcuenta),
 
-            "supervisor": contrato_db.supervisor,
-            "cedula": contrato_db.cedula,
-            "correo": contrato_db.correo,
-            "telefono": contrato_db.telefono,
-            "direccion": contrato_db.direccion,
+            "supervisor": limpiar(contrato_db.supervisor),
+            "cedula": limpiar(contrato_db.cedula),
+            "correo": limpiar(contrato_db.correo),
+            "telefono": limpiar(contrato_db.telefono),
+            "direccion": limpiar(contrato_db.direccion),
 
-            "departamento": contrato_db.departamento,
-            "ciudad": contrato_db.ciudad,
+            "departamento": limpiar(contrato_db.departamento),
+            "ciudad": limpiar(contrato_db.ciudad),
 
             "ejecucion": ejecucion
         }
     )
 
 
-# -----------------------------------------
+# ------------------------------------------------
 # GUARDAR REPORTE
-# -----------------------------------------
+# ------------------------------------------------
 @app.post("/guardar")
 async def guardar(
     request: Request,
@@ -174,9 +194,9 @@ async def guardar(
     )
 
 
-# -----------------------------------------
-# VER REPORTES (API)
-# -----------------------------------------
+# ------------------------------------------------
+# API REPORTES
+# ------------------------------------------------
 @app.get("/ver-reportes")
 async def ver_reportes():
 
