@@ -3,8 +3,12 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from datetime import datetime
 
-from database import SessionLocal
+from database import SessionLocal, engine, Base
+import models
 from models import Contrato, ReporteMensual
+
+# crear tablas automáticamente si no existen
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -13,9 +17,9 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
-# -----------------------------
-# NORMALIZAR CONTRATO
-# -----------------------------
+# -----------------------------------------
+# NORMALIZAR NUMERO DE CONTRATO
+# -----------------------------------------
 def normalizar_contrato(numero):
 
     numero = numero.strip()
@@ -23,16 +27,19 @@ def normalizar_contrato(numero):
     if "-" not in numero:
         return numero
 
-    parte, año = numero.split("-")
+    parte, anio = numero.split("-")
 
-    parte = str(int(parte))
+    try:
+        parte = str(int(parte))
+    except:
+        pass
 
-    return f"{parte}-{año}"
+    return f"{parte}-{anio}"
 
 
-# -----------------------------
+# -----------------------------------------
 # PAGINA PRINCIPAL
-# -----------------------------
+# -----------------------------------------
 @app.get("/")
 async def inicio(request: Request):
 
@@ -42,9 +49,9 @@ async def inicio(request: Request):
     )
 
 
-# -----------------------------
+# -----------------------------------------
 # BUSCAR CONTRATO
-# -----------------------------
+# -----------------------------------------
 @app.post("/buscar")
 async def buscar(request: Request, contrato: str = Form(...)):
 
@@ -64,7 +71,7 @@ async def buscar(request: Request, contrato: str = Form(...)):
             "supervisor.html",
             {
                 "request": request,
-                "error": "El contrato no se encuentra en la base de datos"
+                "error": "Contrato no encontrado"
             }
         )
 
@@ -76,12 +83,12 @@ async def buscar(request: Request, contrato: str = Form(...)):
         ReporteMensual.mes.desc()
     ).first()
 
-    db.close()
-
     ejecucion = ""
 
     if ultimo_reporte:
         ejecucion = f"{ultimo_reporte.porcentaje_ejecucion}%"
+
+    db.close()
 
     return templates.TemplateResponse(
         "supervisor.html",
@@ -108,9 +115,9 @@ async def buscar(request: Request, contrato: str = Form(...)):
     )
 
 
-# -----------------------------
+# -----------------------------------------
 # GUARDAR REPORTE
-# -----------------------------
+# -----------------------------------------
 @app.post("/guardar")
 async def guardar(
     request: Request,
@@ -125,7 +132,7 @@ async def guardar(
     hoy = datetime.now()
 
     mes = hoy.month
-    año = hoy.year
+    anio = hoy.year
 
     db = SessionLocal()
 
@@ -150,11 +157,12 @@ async def guardar(
         porcentaje_ejecucion=porcentaje,
         observaciones=observaciones,
         mes=mes,
-        anio=año
+        anio=anio
     )
 
     db.add(reporte)
     db.commit()
+
     db.close()
 
     return templates.TemplateResponse(
@@ -166,9 +174,9 @@ async def guardar(
     )
 
 
-# -----------------------------
-# VER REPORTES
-# -----------------------------
+# -----------------------------------------
+# VER REPORTES (API)
+# -----------------------------------------
 @app.get("/ver-reportes")
 async def ver_reportes():
 
@@ -179,6 +187,7 @@ async def ver_reportes():
     resultado = []
 
     for r in reportes:
+
         resultado.append({
             "contrato_id": r.contrato_id,
             "mes": r.mes,
