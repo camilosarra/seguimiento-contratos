@@ -1,32 +1,22 @@
-from sqlalchemy import Column, Integer, String, Text, Numeric, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String
 from database import Base
-
 
 class Contrato(Base):
     __tablename__ = "contratos"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True)
+
     numero_contrato = Column(String, index=True)
+    linea = Column(String)
     contratista = Column(String)
-    objeto = Column(Text)
-    valor = Column(Numeric)
+    identificacion_contratista = Column(String)
+    subcuenta = Column(String)
+
     supervisor = Column(String)
+    cedula = Column(String)
+    correo = Column(String)
+    telefono = Column(String)
+    direccion = Column(String)
 
-    reportes = relationship("ReporteMensual", back_populates="contrato")
-
-
-class ReporteMensual(Base):
-    __tablename__ = "reportes_mensuales"
-
-    id = Column(Integer, primary_key=True, index=True)
-
-    contrato_id = Column(Integer, ForeignKey("contratos.id"))
-
-    anio = Column(Integer)
-    mes = Column(Integer)
-
-    porcentaje_ejecucion = Column(Numeric)
-    observaciones = Column(Text)
-
-    contrato = relationship("Contrato", back_populates="reportes")
+    departamento = Column(String)
+    ciudad = Column(String)

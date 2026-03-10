@@ -45,54 +45,29 @@ async def inicio(request: Request):
 # -----------------------------
 # BUSCAR CONTRATO
 # -----------------------------
-@app.post("/buscar")
-async def buscar(request: Request, contrato: str = Form(...)):
+return templates.TemplateResponse(
+    "supervisor.html",
+    {
+        "request": request,
 
-    contrato = normalizar_contrato(contrato)
+        "contrato": contrato_db.numero_contrato,
+        "linea": contrato_db.linea,
+        "contratista": contrato_db.contratista,
+        "identificacion_contratista": contrato_db.identificacion_contratista,
+        "subcuenta": contrato_db.subcuenta,
 
-    db = SessionLocal()
+        "supervisor": contrato_db.supervisor,
+        "cedula": contrato_db.cedula,
+        "correo": contrato_db.correo,
+        "telefono": contrato_db.telefono,
+        "direccion": contrato_db.direccion,
 
-    contrato_db = db.query(Contrato).filter(
-        Contrato.numero_contrato == contrato
-    ).first()
+        "departamento": contrato_db.departamento,
+        "ciudad": contrato_db.ciudad,
 
-    if not contrato_db:
-
-        db.close()
-
-        return templates.TemplateResponse(
-            "supervisor.html",
-            {
-                "request": request,
-                "error": "El contrato no se encuentra en la base de datos"
-            }
-        )
-
-    # Buscar último reporte del contrato
-    ultimo_reporte = db.query(ReporteMensual).filter(
-        ReporteMensual.contrato_id == contrato_db.id
-    ).order_by(
-        ReporteMensual.anio.desc(),
-        ReporteMensual.mes.desc()
-    ).first()
-
-    db.close()
-
-    ejecucion = ""
-
-    if ultimo_reporte:
-        ejecucion = f"{ultimo_reporte.porcentaje_ejecucion}%"
-
-    return templates.TemplateResponse(
-        "supervisor.html",
-        {
-            "request": request,
-            "contrato": contrato_db.numero_contrato,
-            "contratista": contrato_db.contratista,
-            "supervisor": contrato_db.supervisor,
-            "ejecucion": ejecucion
-        }
-    )
+        "ejecucion": ejecucion
+    }
+)
 
 
 # -----------------------------
