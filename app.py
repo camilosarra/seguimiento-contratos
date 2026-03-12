@@ -103,13 +103,13 @@ async def buscar(request: Request, contrato: str = Form(...)):
 
     if ultimo_reporte:
 
-    porcentaje = ultimo_reporte.porcentaje_ejecucion
+        porcentaje = ultimo_reporte.porcentaje_ejecucion
 
-    if porcentaje is not None:
+        if porcentaje is not None:
 
-        porcentaje = porcentaje * 100
+            porcentaje = porcentaje * 100
 
-        ejecucion = f"{round(porcentaje,2)}%"
+            ejecucion = f"{round(porcentaje,2)}%"
 
     db.close()
 
