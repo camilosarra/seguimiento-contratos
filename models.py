@@ -24,6 +24,8 @@ class Contrato(Base):
     departamento = Column(String)
     ciudad = Column(String)
 
+    ejecucion_mes_anterior = Column(Float)
+
 
 class ReporteMensual(Base):
     __tablename__ = "reportes_mensuales"

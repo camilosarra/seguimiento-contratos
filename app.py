@@ -1,16 +1,20 @@
 
+# ===============================
+# app.py - Sistema de contratos
+# ===============================
+
 from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from datetime import datetime
 
 from database import SessionLocal, engine, Base
-import models
 from models import Contrato, ReporteMensual
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -70,8 +74,17 @@ async def buscar(request: Request, contrato: str = Form(...)):
     if ultimo_reporte:
         porcentaje = ultimo_reporte.porcentaje_ejecucion
         if porcentaje is not None:
-            porcentaje = porcentaje * 100
+            if porcentaje <= 1:
+                porcentaje = porcentaje * 100
             ejecucion = f"{round(porcentaje,2)}%"
+
+    ejecucion_anterior = ""
+
+    if contrato_db.ejecucion_mes_anterior is not None:
+        p = contrato_db.ejecucion_mes_anterior
+        if p <= 1:
+            p = p * 100
+        ejecucion_anterior = f"{round(p,2)}%"
 
     db.close()
 
@@ -80,11 +93,6 @@ async def buscar(request: Request, contrato: str = Form(...)):
         {
             "request": request,
             "contrato": limpiar(contrato_db.numero_contrato),
-            "linea": limpiar(contrato_db.linea),
-            "contratista": limpiar(contrato_db.contratista),
-            "identificacion_contratista": limpiar(contrato_db.identificacion_contratista),
-            "subcuenta": limpiar(contrato_db.subcuenta),
-
             "supervisor": limpiar(contrato_db.supervisor),
             "cedula": limpiar(contrato_db.cedula),
             "correo": limpiar(contrato_db.correo),
@@ -92,10 +100,42 @@ async def buscar(request: Request, contrato: str = Form(...)):
             "direccion": limpiar(contrato_db.direccion),
             "departamento": limpiar(contrato_db.departamento),
             "ciudad": limpiar(contrato_db.ciudad),
-
-            "ejecucion": ejecucion
+            "ejecucion": ejecucion,
+            "ejecucion_anterior": ejecucion_anterior
         }
     )
+
+
+@app.post("/actualizar_datos")
+async def actualizar_datos(
+    contrato: str = Form(...),
+    supervisor: str = Form(...),
+    cedula: str = Form(...),
+    correo: str = Form(...),
+    telefono: str = Form(...),
+    direccion: str = Form(...),
+    departamento: str = Form(...),
+    ciudad: str = Form(...)
+):
+
+    db = SessionLocal()
+
+    contrato_db = db.query(Contrato).filter(
+        Contrato.numero_contrato == contrato
+    ).first()
+
+    contrato_db.supervisor = supervisor
+    contrato_db.cedula = cedula
+    contrato_db.correo = correo
+    contrato_db.telefono = telefono
+    contrato_db.direccion = direccion
+    contrato_db.departamento = departamento
+    contrato_db.ciudad = ciudad
+
+    db.commit()
+    db.close()
+
+    return {"mensaje": "Datos actualizados correctamente"}
 
 
 @app.post("/guardar")
@@ -109,6 +149,9 @@ async def guardar(
     porcentaje = porcentaje.replace(",", ".")
     porcentaje = float(porcentaje)
 
+    if porcentaje > 1:
+        porcentaje = porcentaje / 100
+
     hoy = datetime.now()
     mes = hoy.month
     anio = hoy.year
@@ -118,13 +161,6 @@ async def guardar(
     contrato_db = db.query(Contrato).filter(
         Contrato.numero_contrato == contrato
     ).first()
-
-    if not contrato_db:
-        db.close()
-        return templates.TemplateResponse(
-            "supervisor.html",
-            {"request": request, "error": "Contrato no encontrado"}
-        )
 
     campos = [
         contrato_db.supervisor,
@@ -142,7 +178,7 @@ async def guardar(
             "supervisor.html",
             {
                 "request": request,
-                "error": "Favor ingresar la información faltante"
+                "error": "Para guardar, debe ingresar la información faltante"
             }
         )
 
