@@ -3,7 +3,6 @@
 <head>
 
 <meta charset="UTF-8">
-
 <title>Seguimiento contratos</title>
 
 <style>
@@ -110,11 +109,24 @@ cursor:pointer;
 </style>
 
 <script>
+
 function editar(id){
+
 let campo=document.getElementById(id)
+
 campo.removeAttribute("readonly")
 campo.focus()
+
+campo.addEventListener("blur",function(){
+
+document.getElementById("form_"+id).value=campo.value
+
+document.getElementById("form_actualizar").submit()
+
+})
+
 }
+
 </script>
 
 </head>
@@ -152,7 +164,6 @@ Avance técnico Comunicado No. 104
 <form method="post" action="/buscar">
 
 <label>Número de contrato</label>
-
 <input name="contrato" placeholder="Ejemplo 745-2025">
 
 <button>Buscar contrato</button>
@@ -164,8 +175,6 @@ Avance técnico Comunicado No. 104
 {% endif %}
 
 {% if contrato %}
-
-<!-- TARJETA CONTRATO -->
 
 <div class="card">
 
@@ -207,8 +216,6 @@ Avance técnico Comunicado No. 104
 
 </div>
 
-<!-- TARJETA SUPERVISOR -->
-
 <div class="card">
 
 <h3>Datos del supervisor</h3>
@@ -217,55 +224,67 @@ Avance técnico Comunicado No. 104
 
 <div class="field">
 <label>Supervisor <span class="edit" onclick="editar('supervisor')">✏️</span></label>
-<input id="supervisor" value="{{supervisor}}" placeholder="Favor ingresar la información" readonly>
+<input id="supervisor" value="{{supervisor}}" readonly placeholder="Por favor, ingrese la información">
 </div>
 
 <div class="field">
 <label>Cédula supervisor <span class="edit" onclick="editar('cedula')">✏️</span></label>
-<input id="cedula" value="{{cedula}}" placeholder="Favor ingresar la información" readonly>
+<input id="cedula" value="{{cedula}}" readonly placeholder="Por favor, ingrese la información">
 </div>
 
 <div class="field">
 <label>Correo electrónico <span class="edit" onclick="editar('correo')">✏️</span></label>
-<input id="correo" value="{{correo}}" placeholder="Favor ingresar la información" readonly>
+<input id="correo" value="{{correo}}" readonly placeholder="Por favor, ingrese la información">
 </div>
 
 <div class="field">
 <label>Teléfono <span class="edit" onclick="editar('telefono')">✏️</span></label>
-<input id="telefono" value="{{telefono}}" placeholder="Favor ingresar la información" readonly>
+<input id="telefono" value="{{telefono}}" readonly placeholder="Por favor, ingrese la información">
 </div>
 
 <div class="field">
 <label>Dirección <span class="edit" onclick="editar('direccion')">✏️</span></label>
-<input id="direccion" value="{{direccion}}" placeholder="Favor ingresar la información" readonly>
+<input id="direccion" value="{{direccion}}" readonly placeholder="Por favor, ingrese la información">
 </div>
 
 <div class="field">
 <label>Departamento <span class="edit" onclick="editar('departamento')">✏️</span></label>
-<input id="departamento" value="{{departamento}}" placeholder="Favor ingresar la información" readonly>
+<input id="departamento" value="{{departamento}}" readonly placeholder="Por favor, ingrese la información">
 </div>
 
 <div class="field">
 <label>Ciudad <span class="edit" onclick="editar('ciudad')">✏️</span></label>
-<input id="ciudad" value="{{ciudad}}" placeholder="Favor ingresar la información" readonly>
+<input id="ciudad" value="{{ciudad}}" readonly placeholder="Por favor, ingrese la información">
 </div>
 
 </div>
 
 </div>
 
-<!-- REPORTE -->
+<form id="form_actualizar" method="post" action="/actualizar_datos">
+
+<input type="hidden" name="contrato" value="{{contrato}}">
+
+<input type="hidden" name="supervisor" id="form_supervisor">
+<input type="hidden" name="cedula" id="form_cedula">
+<input type="hidden" name="correo" id="form_correo">
+<input type="hidden" name="telefono" id="form_telefono">
+<input type="hidden" name="direccion" id="form_direccion">
+<input type="hidden" name="departamento" id="form_departamento">
+<input type="hidden" name="ciudad" id="form_ciudad">
+
+</form>
 
 <div class="card">
 
-<form method="post" action="/guardar" style="display:flex; flex-direction:column;">
+<form method="post" action="/guardar">
 
 <input type="hidden" name="contrato" value="{{contrato}}">
 
 <h3>Reporte de ejecución técnica</h3>
 
 <label>Porcentaje de ejecución técnica actual</label>
-<input name="porcentaje" placeholder="Ej: 75.50 o 75,50" style="max-width:250px; margin-bottom:20px;" required>
+<input name="porcentaje" required placeholder="Ej: 75.50 o 75,50" style="max-width:250px; margin-bottom:20px;">
 
 <label>Observaciones</label>
 <textarea name="observaciones" style="width:100%; margin-bottom:20px;"></textarea>
