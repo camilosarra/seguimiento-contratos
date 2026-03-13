@@ -1,4 +1,3 @@
-
 # ===============================
 # app.py - Sistema de contratos
 # ===============================
@@ -49,6 +48,7 @@ async def inicio(request: Request):
 async def buscar(request: Request, contrato: str = Form(...)):
 
     contrato = normalizar_contrato(contrato)
+
     db = SessionLocal()
 
     contrato_db = db.query(Contrato).filter(
@@ -62,29 +62,16 @@ async def buscar(request: Request, contrato: str = Form(...)):
             {"request": request, "error": "Contrato no encontrado"}
         )
 
-    ultimo_reporte = db.query(ReporteMensual).filter(
-        ReporteMensual.contrato_id == contrato_db.id
-    ).order_by(
-        ReporteMensual.anio.desc(),
-        ReporteMensual.mes.desc()
-    ).first()
-
     ejecucion = ""
 
-    if ultimo_reporte:
-        porcentaje = ultimo_reporte.porcentaje_ejecucion
-        if porcentaje is not None:
-            if porcentaje <= 1:
-                porcentaje = porcentaje * 100
-            ejecucion = f"{round(porcentaje,2)}%"
-
-    ejecucion_anterior = ""
-
     if contrato_db.ejecucion_mes_anterior is not None:
+
         p = contrato_db.ejecucion_mes_anterior
+
         if p <= 1:
             p = p * 100
-        ejecucion_anterior = f"{round(p,2)}%"
+
+        ejecucion = f"{round(p,2)}%"
 
     db.close()
 
@@ -92,7 +79,14 @@ async def buscar(request: Request, contrato: str = Form(...)):
         "supervisor.html",
         {
             "request": request,
+
             "contrato": limpiar(contrato_db.numero_contrato),
+
+            "linea": limpiar(contrato_db.linea),
+            "contratista": limpiar(contrato_db.contratista),
+            "identificacion_contratista": limpiar(contrato_db.identificacion_contratista),
+            "subcuenta": limpiar(contrato_db.subcuenta),
+
             "supervisor": limpiar(contrato_db.supervisor),
             "cedula": limpiar(contrato_db.cedula),
             "correo": limpiar(contrato_db.correo),
@@ -100,8 +94,8 @@ async def buscar(request: Request, contrato: str = Form(...)):
             "direccion": limpiar(contrato_db.direccion),
             "departamento": limpiar(contrato_db.departamento),
             "ciudad": limpiar(contrato_db.ciudad),
-            "ejecucion": ejecucion,
-            "ejecucion_anterior": ejecucion_anterior
+
+            "ejecucion": ejecucion
         }
     )
 
